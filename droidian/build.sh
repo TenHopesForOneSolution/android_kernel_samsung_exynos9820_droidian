@@ -3,6 +3,10 @@
 set -euo pipefail
 repo=$(cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$repo"
+# Fail before downloading build inputs if the checkout is inaccessible.
+commit=$(git rev-parse --verify HEAD)
+export SOURCE_DATE_EPOCH
+SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
 work=${S10E_BUILD_ROOT:-$repo/.build/droidian}
 cache=${S10E_DOWNLOAD_CACHE:-$repo/.cache/droidian}
 dist=${S10E_DIST_DIR:-$repo/dist}
@@ -17,9 +21,6 @@ python3 droidian/fetch.py --cache "$cache" --work "$work"
 
 export PATH="$work/toolchain/bin:$PATH"
 export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-commit=$(git rev-parse HEAD)
-export SOURCE_DATE_EPOCH
-SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
 export KBUILD_BUILD_USER=s10e KBUILD_BUILD_HOST=droidian-builder
 export KBUILD_BUILD_VERSION=1
 export KBUILD_BUILD_TIMESTAMP

@@ -29,6 +29,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Allow Git access to the container checkout
+        run: |
+          # The runner owns this bind mount; the builder runs as root.
+          # checkout's temporary Git config is not kept for shell steps.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git rev-parse --verify HEAD
       - name: Check build and release scripts
         run: |
           bash -n droidian/build.sh droidian/install-build-deps.sh
