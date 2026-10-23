@@ -217,6 +217,7 @@ EXPORT_SYMBOL(unregister_lsm_notifier);
 		RC = security_integrity_current();		\
 		if (RC != 0)							\
 			break;								\
+		RC = IRC;					\
 		list_for_each_entry(P, &security_hook_heads.FUNC, list) { \
 			RC = P->hook.FUNC(__VA_ARGS__);		\
 			if (RC != 0)				\

@@ -3349,13 +3349,24 @@ static void binder_transaction(struct binder_proc *proc,
 	}
 
 	if (target_node && target_node->txn_security_ctx) {
-		u32 secid;
+		u32 secid = 0;
 		size_t added_size;
 		int max_retries = 100;
 
 		security_task_getsecid(proc->tsk, &secid);
  retry_alloc:
 		ret = security_secid_to_secctx(secid, &secctx, &secctx_sz);
+		/* Halium may run with SELinux disabled while vendor clients still
+		 * request transaction security contexts. No LSM context is available
+		 * in that case; deliver an ordinary transaction, as with the Halium
+		 * libbinder patch which omits FLAT_BINDER_FLAG_TXN_SECURITY_CTX.
+		 * Preserve all actual permission and allocation failures.
+		 */
+		if (ret == -EOPNOTSUPP) {
+			secctx = NULL;
+			secctx_sz = 0;
+			ret = 0;
+		}
 		if (ret == -ENOMEM && max_retries-- > 0) {
 			struct page *dummy_page;
 

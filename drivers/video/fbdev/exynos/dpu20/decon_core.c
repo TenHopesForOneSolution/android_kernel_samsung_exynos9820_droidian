@@ -3398,6 +3398,34 @@ static int decon_ioctl(struct fb_info *info, unsigned int cmd,
 		}
 		break;
 
+	case S3CFB_WIN_CONFIG_ANDROID12: {
+		struct decon_win_config_data_android12 *legacy;
+
+		/* Translate fields, not just the ioctl number: fps changed offsets. */
+		legacy = memdup_user((void __user *)arg, sizeof(*legacy));
+		if (IS_ERR(legacy)) {
+			ret = PTR_ERR(legacy);
+			break;
+		}
+		memset(&win_data, 0, sizeof(win_data));
+		win_data.retire_fence = legacy->retire_fence;
+		win_data.fd_odma = legacy->fd_odma;
+		win_data.fps = lcd_info->fps;
+		memcpy(win_data.config, legacy->config, sizeof(win_data.config));
+		win_data.extra = legacy->extra;
+		ret = decon_set_win_config(decon, &win_data);
+		if (!ret) {
+			legacy->retire_fence = win_data.retire_fence;
+			legacy->fd_odma = win_data.fd_odma;
+			memcpy(legacy->config, win_data.config, sizeof(legacy->config));
+			legacy->extra = win_data.extra;
+			if (copy_to_user((void __user *)arg, legacy, sizeof(*legacy)))
+				ret = -EFAULT;
+		}
+		kfree(legacy);
+		break;
+	}
+
 	case S3CFB_GET_HDR_CAPABILITIES:
 		memset(&hdr_capa, 0, sizeof(struct decon_hdr_capabilities));
 

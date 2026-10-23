@@ -25,7 +25,7 @@ extern char* unpack_to_rootfs(char *buf, unsigned long len);
 
 __init int mount_sar_ramdisk(char* name) {
 	struct boot_img_hdr_v1 header;
-	unsigned int rd_offset;
+	unsigned int rd_offset = 0;
 	int fd;
 	int res = 0;
 	char* buf;

@@ -561,6 +561,14 @@ struct decon_win_config_data {
 	struct decon_win_config_extra extra;
 };
 
+/* Android 12 vendor ABI, before fps shifted config by eight bytes. */
+struct decon_win_config_data_android12 {
+	int retire_fence;
+	int fd_odma;
+	struct decon_win_config config[MAX_DECON_WIN + 1];
+	struct decon_win_config_extra extra;
+};
+
 enum hwc_ver {
 	HWC_INIT = 0,
 	HWC_1_0 = 1,
@@ -1927,6 +1935,8 @@ int _decon_enable(struct decon_device *decon, enum decon_state state);
 						struct decon_win_config_data_old)
 #define S3CFB_WIN_CONFIG		_IOW('F', 209, \
 						struct decon_win_config_data)
+#define S3CFB_WIN_CONFIG_ANDROID12	_IOW('F', 209, \
+					struct decon_win_config_data_android12)
 
 /* cursor async */
 #define DECON_WIN_CURSOR_POS		_IOW('F', 222, struct decon_user_window)

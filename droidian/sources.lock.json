@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kernel_base": {
+    "repository": "https://github.com/LineageOS/android_kernel_samsung_exynos9820",
+    "commit": "a412cfaf86b980ce35cae96a35f678c8ea551575",
+    "branch": "lineage-23.2"
+  },
+  "builder_image": "quay.io/droidian/build-essential@sha256:887ff647029536e2b6d68a5008ce6b5ab38e45721632ca78b1a7ffec0e1a9eeb",
+  "common_fragments": {
+    "repository": "https://github.com/droidian-devices/common_fragments",
+    "commit": "438e885f38dba4840677b5b4f8bf5166e21e2b32",
+    "files": ["halium.config", "droidian.config"]
+  },
+  "toolchain": {
+    "name": "clang-r563880c",
+    "url": "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/9916fb51ccb914d62d35ad9a7b9b21d2ef046928/clang-r563880c.tar.gz",
+    "sha256": "7ccb7b4c2954a97a8846a8f17a00c311aa08e9c4e40746c21896afaae1df2a55",
+    "strip_components": 0
+  },
+  "v4l2loopback": {
+    "name": "v4l2loopback-0.12.7",
+    "url": "https://codeload.github.com/umlaeute/v4l2loopback/tar.gz/refs/tags/v0.12.7",
+    "sha256": "e0782b8abe8f2235e2734f725dc1533a0729e674c4b7834921ade43b9f04939b",
+    "strip_components": 1
+  }
+}

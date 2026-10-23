@@ -124,3 +124,19 @@ all.config
 
 # fetched Android config fragments
 kernel/configs/android-*.cfg
+
+# Droidian standalone build outputs
+/.build/
+/.cache/
+/dist/
+/droidian/__pycache__/
+/droidian/tests/__pycache__/
+
+# Keep port CI and external-module patches despite the kernel-wide patterns.
+!/.github/
+!/.github/workflows/
+!/.github/workflows/kernel.yml
+!/droidian/patches/*.patch
+
+!/droidian/patches/
+!/droidian/patches/*.patch

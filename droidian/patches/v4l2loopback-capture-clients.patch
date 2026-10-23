@@ -1,0 +1,135 @@
+--- a/v4l2loopback.c
++++ b/v4l2loopback.c
+@@ -373,6 +373,7 @@
+ 
+ 	/* sync stuff */
+ 	atomic_t open_count;
++	atomic_t capture_clients;
+ 
+ 	int ready_for_capture; /* set to true when at least one writer opened
+ 			       * device and negotiated format */
+@@ -397,6 +398,7 @@
+ /* struct keeping state and type of opener */
+ struct v4l2_loopback_opener {
+ 	enum opener_type type;
++	atomic_t capture_active;
+ 	int read_position; /* number of last processed frame + 1 or
+ 			    * write_position - 1 if reader went out of sync */
+ 	unsigned int reread_count;
+@@ -556,6 +558,17 @@
+ 
+ static DEVICE_ATTR(buffers, S_IRUGO, attr_show_buffers, NULL);
+ 
++/* Allow a userspace HAL bridge to power the camera only while consumed. */
++static ssize_t attr_show_capture_clients(struct device *cd,
++				struct device_attribute *attr, char *buf)
++{
++	struct v4l2_loopback_device *dev = v4l2loopback_cd2dev(cd);
++	if (!dev)
++		return -ENODEV;
++	return sprintf(buf, "%d\n", atomic_read(&dev->capture_clients));
++}
++static DEVICE_ATTR(capture_clients, S_IRUGO, attr_show_capture_clients, NULL);
++
+ static ssize_t attr_show_maxopeners(struct device *cd,
+ 				    struct device_attribute *attr, char *buf)
+ {
+@@ -605,6 +618,7 @@
+ 		V4L2_SYSFS_DESTROY(format);
+ 		V4L2_SYSFS_DESTROY(buffers);
+ 		V4L2_SYSFS_DESTROY(max_openers);
++		V4L2_SYSFS_DESTROY(capture_clients);
+ 		/* ... */
+ 	}
+ }
+@@ -623,6 +637,7 @@
+ 		V4L2_SYSFS_CREATE(format);
+ 		V4L2_SYSFS_CREATE(buffers);
+ 		V4L2_SYSFS_CREATE(max_openers);
++		V4L2_SYSFS_CREATE(capture_clients);
+ 		/* ... */
+ 	} while (0);
+ 
+@@ -1197,7 +1212,7 @@
+ /* get ctrls info
+  * called on VIDIOC_QUERYCTRL
+  */
+-static int vidioc_queryctrl(struct file *file, void *fh,
++static int __maybe_unused vidioc_queryctrl(struct file *file, void *fh,
+ 			    struct v4l2_queryctrl *q)
+ {
+ 	const struct v4l2_ctrl_config *cnf = 0;
+@@ -1231,7 +1246,7 @@
+ 	return 0;
+ }
+ 
+-static int vidioc_g_ctrl(struct file *file, void *fh, struct v4l2_control *c)
++static int __maybe_unused vidioc_g_ctrl(struct file *file, void *fh, struct v4l2_control *c)
+ {
+ 	struct v4l2_loopback_device *dev = v4l2loopback_getdevice(file);
+ 
+@@ -1299,7 +1314,7 @@
+ 		ctrl->handler, struct v4l2_loopback_device, ctrl_handler);
+ 	return v4l2loopback_set_ctrl(dev, ctrl->id, ctrl->val);
+ }
+-static int vidioc_s_ctrl(struct file *file, void *fh, struct v4l2_control *c)
++static int __maybe_unused vidioc_s_ctrl(struct file *file, void *fh, struct v4l2_control *c)
+ {
+ 	struct v4l2_loopback_device *dev = v4l2loopback_getdevice(file);
+ 	return v4l2loopback_set_ctrl(dev, c->id, c->value);
+@@ -1743,6 +1758,8 @@
+ 		opener->type = READER;
+ 		if (!dev->ready_for_capture)
+ 			return -EIO;
++		if (!atomic_xchg(&opener->capture_active, 1))
++			atomic_inc(&dev->capture_clients);
+ 		return 0;
+ 	default:
+ 		return -EINVAL;
+@@ -1756,7 +1773,12 @@
+ static int vidioc_streamoff(struct file *file, void *fh,
+ 			    enum v4l2_buf_type type)
+ {
+-	MARK();
++	struct v4l2_loopback_device *dev = v4l2loopback_getdevice(file);
++	struct v4l2_loopback_opener *opener = fh_to_opener(fh);
++	MARK();
++	if (type == V4L2_BUF_TYPE_VIDEO_CAPTURE &&
++	    atomic_xchg(&opener->capture_active, 0))
++		atomic_dec(&dev->capture_clients);
+ 	dprintk("%d\n", type);
+ 	return 0;
+ }
+@@ -1988,6 +2010,8 @@
+ 
+ 	if (WRITER == opener->type)
+ 		iswriter = 1;
++	if (atomic_xchg(&opener->capture_active, 0))
++		atomic_dec(&dev->capture_clients);
+ 
+ 	atomic_dec(&dev->open_count);
+ 	if (dev->open_count.counter == 0) {
+@@ -2350,6 +2374,7 @@
+ 	}
+ 	memset(dev->bufpos2index, 0, sizeof(dev->bufpos2index));
+ 	atomic_set(&dev->open_count, 0);
++	atomic_set(&dev->capture_clients, 0);
+ 	dev->ready_for_capture = 0;
+ 	dev->ready_for_output = 1;
+ 	dev->announce_all_caps = (!exclusive_caps[nr]);
+@@ -2609,15 +2634,3 @@
+ 
+ late_initcall(v4l2loopback_init_module);
+ module_exit(v4l2loopback_cleanup_module);
+-
+-/*
+- * fake usage of unused functions
+- */
+-#ifdef HAVE__V4L2_CTRLS
+-static int vidioc_queryctrl(struct file *file, void *fh,
+-			    struct v4l2_queryctrl *q) __attribute__((unused));
+-static int vidioc_g_ctrl(struct file *file, void *fh, struct v4l2_control *c)
+-	__attribute__((unused));
+-static int vidioc_s_ctrl(struct file *file, void *fh, struct v4l2_control *c)
+-	__attribute__((unused));
+-#endif /* HAVE__V4L2_CTRLS */
