@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 """Validate release components and record the exact source/toolchain identity."""
 import argparse
-import hashlib
 import json
 import os
 import struct
@@ -59,7 +58,7 @@ def main():
         "hardware_validation": "pending; CI validation does not boot a physical phone",
     }
     (dist / "build-info.json").write_text(json.dumps(info, indent=2) + "\n")
-    filenames = ["Image", "kernel.config", "Module.symvers", "sources.lock.json", "modules.tar.gz", "dtbs.tar.gz", "build-info.json"]
+    filenames = ["Image", "kernel.config", "Module.symvers", "sources.lock.json", "toolchain-files.json", "modules.tar.gz", "dtbs.tar.gz", "build-info.json"]
     (dist / "SHA256SUMS").write_text("".join(digest(dist / name) + "  " + name + "\n" for name in filenames))
     print(json.dumps(info, indent=2))
 

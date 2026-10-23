@@ -29,8 +29,11 @@ disabled, matching its existing Droidian integration.
 ## Build locally
 
 The compiler, builder image and camera-module sources are pinned in
-[droidian/sources.lock.json](droidian/sources.lock.json). Downloaded archives are
-verified with SHA-256. Config fragments are included in this repository; the
+[droidian/sources.lock.json](droidian/sources.lock.json). Downloaded inputs are
+verified with SHA-256. Gitiles regenerates toolchain archive timestamps, so
+`toolchain-files.json` pins every file's contents, mode and symlink target while
+allowing those timestamps to vary. The v4l2loopback archive is pinned as a whole.
+Config fragments are included in this repository; the
 upstream Halium/Droidian fragments come from `common_fragments` commit
 `438e885f38dba4840677b5b4f8bf5166e21e2b32`.
 
@@ -78,6 +81,7 @@ The release job is restricted to this port's GitHub repository and `main`.
 | `kernel.config` | Resolved kernel configuration |
 | `Module.symvers` | Symbol versions for additional modules |
 | `sources.lock.json` | Pinned build inputs and provenance |
+| `toolchain-files.json` | Exact toolchain file checksums and metadata |
 | `build-info.json` | Source commit, compiler, kernel release and validation status |
 | `SHA256SUMS` | Checksums of the files above |
 

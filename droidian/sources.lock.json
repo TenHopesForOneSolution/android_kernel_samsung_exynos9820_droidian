@@ -9,13 +9,18 @@
   "common_fragments": {
     "repository": "https://github.com/droidian-devices/common_fragments",
     "commit": "438e885f38dba4840677b5b4f8bf5166e21e2b32",
-    "files": ["halium.config", "droidian.config"]
+    "files": [
+      "halium.config",
+      "droidian.config"
+    ]
   },
   "toolchain": {
     "name": "clang-r563880c",
     "url": "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/9916fb51ccb914d62d35ad9a7b9b21d2ef046928/clang-r563880c.tar.gz",
-    "sha256": "7ccb7b4c2954a97a8846a8f17a00c311aa08e9c4e40746c21896afaae1df2a55",
-    "strip_components": 0
+    "strip_components": 0,
+    "manifest": "toolchain-files.json",
+    "manifest_sha256": "89d8d534ec373efaa6cf9ef2f05daa3d4edb0a20094d94f014cb62fb186bb378",
+    "bootstrap_archive_sha256": "7ccb7b4c2954a97a8846a8f17a00c311aa08e9c4e40746c21896afaae1df2a55"
   },
   "v4l2loopback": {
     "name": "v4l2loopback-0.12.7",

@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 ASSETS = {"Image", "kernel.config", "Module.symvers", "sources.lock.json",
-          "modules.tar.gz", "dtbs.tar.gz", "build-info.json"}
+          "toolchain-files.json", "modules.tar.gz", "dtbs.tar.gz", "build-info.json"}
 
 
 def next_build_number(tags):

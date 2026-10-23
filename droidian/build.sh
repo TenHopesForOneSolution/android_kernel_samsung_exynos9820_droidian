@@ -65,6 +65,7 @@ install -m 644 "$work/kernel/arch/arm64/boot/Image" "$dist/Image"
 install -m 644 "$work/kernel/.config" "$dist/kernel.config"
 install -m 644 "$work/kernel/Module.symvers" "$dist/Module.symvers"
 install -m 644 droidian/sources.lock.json "$dist/sources.lock.json"
+install -m 644 droidian/toolchain-files.json "$dist/toolchain-files.json"
 tar --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --numeric-owner \
     -C "$staging" -cf - "lib/modules/$release" | gzip -n > "$dist/modules.tar.gz"
 (
