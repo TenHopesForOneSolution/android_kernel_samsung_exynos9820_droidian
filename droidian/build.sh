@@ -11,6 +11,8 @@ jobs=${S10E_JOBS:-$(getconf _NPROCESSORS_ONLN)}
 mkdir -p "$work/kernel" "$dist"
 work=$(cd "$work" && pwd)
 dist=$(cd "$dist" && pwd)
+exec 9>"$work/.build-lock"
+flock -n 9 || { echo 'Another build is using this work directory' >&2; exit 1; }
 python3 droidian/fetch.py --cache "$cache" --work "$work"
 
 export PATH="$work/toolchain/bin:$PATH"
