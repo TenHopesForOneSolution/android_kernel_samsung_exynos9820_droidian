@@ -31,8 +31,10 @@ jobs:
           persist-credentials: false
       - name: Check build and release scripts
         run: |
-          bash -n droidian/build.sh
+          bash -n droidian/build.sh droidian/install-build-deps.sh
           python3 -m unittest discover -s droidian/tests -v
+      - name: Install pinned kernel build dependencies
+        run: ./droidian/install-build-deps.sh
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .cache/droidian

@@ -27,5 +27,12 @@
     "url": "https://codeload.github.com/umlaeute/v4l2loopback/tar.gz/refs/tags/v0.12.7",
     "sha256": "e0782b8abe8f2235e2734f725dc1533a0729e674c4b7834921ade43b9f04939b",
     "strip_components": 1
+  },
+  "build_packages": {
+    "bc": "1.07.1-4",
+    "binutils-aarch64-linux-gnu": "2.44-3",
+    "bison": "2:3.8.2+dfsg-1+b2",
+    "flex": "2.6.4-8.2+b4",
+    "libssl-dev": "3.5.1-1"
   }
 }

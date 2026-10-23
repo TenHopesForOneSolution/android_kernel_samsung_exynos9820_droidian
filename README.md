@@ -42,7 +42,7 @@ On an x86-64 Linux machine with Docker:
 ```sh
 builder=$(python3 -c 'import json; print(json.load(open("droidian/sources.lock.json"))["builder_image"])')
 docker run --rm -v "$PWD:/src" -w /src "$builder" bash -c \
-  'git config --global --add safe.directory /src; ./droidian/build.sh'
+  'git config --global --add safe.directory /src; ./droidian/install-build-deps.sh && ./droidian/build.sh'
 ```
 
 Docker may create root-owned build files in the checkout. Build products stay in
